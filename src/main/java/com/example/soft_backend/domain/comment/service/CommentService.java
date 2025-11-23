@@ -40,7 +40,10 @@ import com.example.soft_backend.domain.comment.repository.CommentRepository;
 import com.example.soft_backend.domain.post.entity.Post;
 import com.example.soft_backend.domain.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -48,9 +51,9 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
 
+    @Transactional
     public CommentResponseDto createComment(Long postId, CommentRequestDto commentRequestDto) {
-        // 1. postId가 식별자인 Post를 조회
-        Post post = postRepository.findById(postId).orElse(null);
+        Post post = findPostOrThrow(postId);
 
         // 2. comment 생성
         Comment comment = Comment.builder()
@@ -67,25 +70,29 @@ public class CommentService {
                 .build();
     }
 
+    @Transactional
     public String deleteComment(Long postId, Long commentId) {
-        // 1. postId가 식별자인 Post가 존재하는지 확인
-        Post post = postRepository.findById(postId).orElse(null);
-        if(post == null) {
-            return postId + "번 게시글은 존재하지 않습니다.";
+        Post post = findPostOrThrow(postId);
+
+        Comment comment = findCommentOrThrow(commentId);
+
+        if (!post.getComments().contains(comment)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    commentId + "번 댓글은 " + postId + "번 게시글의 댓글이 아닙니다.");
         }
 
-        // 2. 조건에 따라 comment 삭제 여부 결정
-        Comment comment = commentRepository.findById(commentId).orElse(null);
-        if (comment == null) {
-            return commentId + "번 댓글은 존재하지 않습니다.";
-        }
+        commentRepository.delete(comment);
+        return commentId + "번 댓글이 삭제되었습니다.";
+    }
 
-        if (post.getComments().contains(comment)) {
-            commentRepository.delete(comment);
-            return commentId + "번 댓글이 삭제되었습니다.";
-        } else {
-            return commentId + "번 댓글은" + postId + "번 게시글의 댓글이 아닙니다.";
-        }
+    private Post findPostOrThrow(Long postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "게시글을 찾을 수 없습니다."));
+    }
+
+    private Comment findCommentOrThrow(Long commentId) {
+        return commentRepository.findById(commentId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다."));
     }
 }
 
