@@ -13,7 +13,7 @@ public class PostListResponseDto {
     private final Long id;
     private final String title;
     private final Integer commentCount;
-    private Long writerId;
+    private Long WriterId;
     private String writerName;
 
 }

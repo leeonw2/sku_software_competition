@@ -35,7 +35,7 @@ public class PostController {
 
     @GetMapping("/{post-id}") //비공개 게시글이라면 사용자의 아이디와 같이 일치한지 아닌지 처리를 해서 사용자의 아이디를 받는 경우도 있다.
     public PostResponseDto getPostById(@PathVariable(value = "post-id") Long id){
-        PostResponseDto responseDto = postService.readPost(id);  //crud에 따라 read를 쓴고!
+        PostResponseDto responseDto = postService.readPost(id);  //crud에 따라 read를 쓴거
         return responseDto;
     }
 

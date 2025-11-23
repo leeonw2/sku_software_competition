@@ -8,7 +8,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class CreatePostRequestDto {
-    private final Long WriterId;
+    private final Long writerId;
     private final BoardType boardType;  //게시판 종류
     private final String title;
     private final String content;
