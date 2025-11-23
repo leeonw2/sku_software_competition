@@ -19,6 +19,8 @@ public class UserResponseDto {
                 .id(user.getId())
                 .studentId(user.getStudentId())
                 .name(user.getName())
+                .department(user.getDepartment())
+                .gender(user.getGender())
                 .build();
     }
 }

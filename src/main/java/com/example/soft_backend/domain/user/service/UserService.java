@@ -30,6 +30,8 @@ public class UserService {
                 .studentId(request.getStudentId())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .name(request.getName())
+                .department(request.getDepartment())
+                .gender(request.getGender())
                 .build();
 
         UserEntity saved = userRepository.save(user);
@@ -47,4 +49,11 @@ public class UserService {
 
         return UserResponseDto.from(user);
     }
+
+
+    public UserEntity findById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+    }
+
 }

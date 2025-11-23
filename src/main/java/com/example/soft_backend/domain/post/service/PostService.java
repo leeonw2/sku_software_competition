@@ -4,6 +4,8 @@ package com.example.soft_backend.domain.post.service;
 
 
 
+import com.example.soft_backend.domain.board.entity.BoardEntity;
+import com.example.soft_backend.domain.board.repository.BoardRepository;
 import com.example.soft_backend.domain.comment.dto.response.CommentResponseDto;
 import com.example.soft_backend.domain.comment.entity.Comment;
 import com.example.soft_backend.domain.post.dto.request.CreatePostRequestDto;
@@ -14,6 +16,9 @@ import com.example.soft_backend.domain.post.entity.Post;
 import com.example.soft_backend.domain.post.repository.PostRepository;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.example.soft_backend.domain.user.entity.UserEntity;
+import com.example.soft_backend.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,13 +28,25 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class PostService {
     private final PostRepository postRepository;
+    private final BoardRepository boardRepository;
+    private final UserService userService;
 
     @Transactional
     public PostResponseDto createPost(CreatePostRequestDto createPostRequestDto) {
+
+        BoardEntity board = boardRepository.findByType(createPostRequestDto.getBoardType())
+                .orElseThrow(() -> new IllegalArgumentException("없는 게시판 타입입니다: " + createPostRequestDto.getBoardType()));
+
+
+        //현재 로그인한 유저 불러오는 메소드 Userservice에서 만들거임
+//        UserEntity writer = userService.getCurrentUser();
+        UserEntity writer = userService.findById(createPostRequestDto.getWriterId());
         // 1. PostRequestDto에 있는 값으로 post 클래스 객체 생성
         Post post = Post.builder()
+                .board(board)
                 .title(createPostRequestDto.getTitle())
                 .content(createPostRequestDto.getContent())
+                .writer(writer)
                 .build();
 
         // 2. 새로 생성한 post 객체 DB에 저장
@@ -41,6 +58,7 @@ public class PostService {
                 .title(savedPost.getTitle())
                 .content(savedPost.getContent())
                 .build();
+//        return PostResponseDto.from(post);    //이게 맞냐?????
     }
 
     @Transactional(readOnly = true)
@@ -106,3 +124,5 @@ public class PostService {
         return responseDtos;
     }
 }
+
+
