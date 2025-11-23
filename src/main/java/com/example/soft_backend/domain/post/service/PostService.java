@@ -14,14 +14,15 @@ import com.example.soft_backend.domain.post.dto.response.PostListResponseDto;
 import com.example.soft_backend.domain.post.dto.response.PostResponseDto;
 import com.example.soft_backend.domain.post.entity.Post;
 import com.example.soft_backend.domain.post.repository.PostRepository;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.example.soft_backend.domain.user.entity.UserEntity;
 import com.example.soft_backend.domain.user.service.UserService;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 
 @RequiredArgsConstructor
@@ -35,7 +36,10 @@ public class PostService {
     public PostResponseDto createPost(CreatePostRequestDto createPostRequestDto) {
 
         BoardEntity board = boardRepository.findByType(createPostRequestDto.getBoardType())
-                .orElseThrow(() -> new IllegalArgumentException("없는 게시판 타입입니다: " + createPostRequestDto.getBoardType()));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "없는 게시판 타입입니다: " + createPostRequestDto.getBoardType()
+                ));
 
 
         //현재 로그인한 유저 불러오는 메소드 Userservice에서 만들거임
@@ -63,32 +67,27 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public PostResponseDto readPost(Long postId){
-        // 1. postId를 통해서 Post 조회, 예외처리 필요
-        Post post = postRepository.findById(postId).orElse(null);
+        Post post = findPostOrThrow(postId);
 
-        // 2. postResponseDto에 해당 Post 내용을 담아서 반환
         return PostResponseDto.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .commentCount(post.getComments().size())
-                .comments(post.getComments().
-                        stream().map(comment -> CommentResponseDto.builder()
+                .comments(post.getComments().stream()
+                        .map(comment -> CommentResponseDto.builder()
                                 .commentId(comment.getId())
                                 .body(comment.getBody())
-                                .build()).toList())
+                                .build())
+                        .toList())
                 .build();
     }
 
     @Transactional
     public PostResponseDto updatePost(UpdatePostRequestDto updatePostRequestDto, Long postId) {
-        // 1. postId를 통해서 Post 조회, 예외 처리 필요
-        Post post = postRepository.findById(postId).orElse(null);
+        Post post = findPostOrThrow(postId);
 
-        // 2. 해당 post의 값을 변경
         post.update(updatePostRequestDto.getTitle(), updatePostRequestDto.getContent());
-
-        // 3. postResponseDto에 해당 Post 내용을 담아서 반환
         return PostResponseDto.builder()
                 .id(post.getId())
                 .title(post.getTitle())
@@ -98,13 +97,10 @@ public class PostService {
 
     @Transactional
     public String deletePost(Long postId) {
-        // 1. postId를 통해서 해당 Post 존재 여부 조회, 존재 여부에 따라 삭제 조건문 필요
-        if(postRepository.existsById(postId)){
-            postRepository.deleteById(postId);
-            return postId + "번 게시글 삭제 완료";
-        } else {
-            return postId + "번 게시글이 존재하지 않습니다.";
-        }
+        Post post = findPostOrThrow(postId);
+
+        postRepository.delete(post);
+        return postId + "번 게시글 삭제 완료";
     }
 
     @Transactional(readOnly = true)
@@ -122,6 +118,11 @@ public class PostService {
         ).toList();
 
         return responseDtos;
+    }
+
+    private Post findPostOrThrow(Long postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "게시글을 찾을 수 없습니다."));
     }
 }
 
