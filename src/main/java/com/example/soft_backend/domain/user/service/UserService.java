@@ -1,6 +1,8 @@
 package com.example.soft_backend.domain.user.service;
 
+import com.example.soft_backend.domain.user.entity.CoopStyle;
 import com.example.soft_backend.domain.user.entity.UserEntity;
+import com.example.soft_backend.domain.user.entity.UserRole;
 import com.example.soft_backend.domain.user.repository.UserRepository;
 import com.example.soft_backend.domain.user.dto.LoginRequestDto;
 import com.example.soft_backend.domain.user.dto.SignupRequestDto;
@@ -32,6 +34,10 @@ public class UserService {
                 .name(request.getName())
                 .department(request.getDepartment())
                 .gender(request.getGender())
+                .role(UserRole.USER)
+                .coopStyle(request.getCoopStyle() != null
+                        ? CoopStyle.valueOf(request.getCoopStyle())
+                        : null)
                 .build();
 
         UserEntity saved = userRepository.save(user);

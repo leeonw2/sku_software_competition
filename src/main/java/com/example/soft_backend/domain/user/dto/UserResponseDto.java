@@ -14,6 +14,9 @@ public class UserResponseDto {
     private String department;
     private String gender;
 
+    private String coopStyleCode;   // SC
+    private String coopStyleLabel;   //멘트
+
     public static UserResponseDto from(UserEntity user) {
         return UserResponseDto.builder()
                 .id(user.getId())
@@ -21,6 +24,12 @@ public class UserResponseDto {
                 .name(user.getName())
                 .department(user.getDepartment())
                 .gender(user.getGender())
+                .coopStyleCode(
+                        user.getCoopStyle() != null ? user.getCoopStyle().name() : null
+                )
+                .coopStyleLabel(
+                        user.getCoopStyle() != null ? user.getCoopStyle().getLabel() : null
+                )
                 .build();
     }
 }

@@ -1,11 +1,11 @@
 package com.example.soft_backend.domain.post.dto.request;
 
-import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
+@NoArgsConstructor
 public class UpdatePostRequestDto {
-    private final String title;
-    private final String content;
+    private String title;
+    private String content;
 }

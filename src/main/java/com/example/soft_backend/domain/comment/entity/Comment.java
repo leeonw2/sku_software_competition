@@ -1,5 +1,3 @@
-package com.example.soft_backend.domain.comment.entity;
-
 //import com.example.mentor_mentee.domain.post.entity.Post;
 //import jakarta.persistence.*;
 //import lombok.AllArgsConstructor;
@@ -35,7 +33,7 @@ package com.example.soft_backend.domain.comment.entity;
 //    @JoinColumn(name = "post_id", nullable = false) // FK 생성
 //    private Post post;
 //}
-
+package com.example.soft_backend.domain.comment.entity;
 import com.example.soft_backend.domain.post.entity.Post;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

@@ -12,4 +12,5 @@ public class SignupRequestDto {
     private String name;        //이름
     private String department;  //학과
     private String gender;      //성별
+    private String coopStyle;   // "SC", "SE", "FC", "FL" 중 하나
 }

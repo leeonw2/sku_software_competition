@@ -1,19 +1,30 @@
 package com.example.soft_backend.domain.post.dto.response;
 
-import lombok.Getter;
-import com.example.soft_backend.domain.comment.dto.response.CommentResponseDto;
-import com.example.soft_backend.domain.post.repository.PostRepository;
+import com.example.soft_backend.domain.post.entity.Post;
 import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import lombok.Getter;
 
-@Builder
 @Getter
+@Builder
 public class PostListResponseDto {
-    private final Long id;
-    private final String title;
-    private final Integer commentCount;
-    private Long WriterId;
-    private String writerName;
 
+    private Long id;
+    private String title;
+    private String content;
+    private String boardType;
+    private Long writerId;
+    private String writerName;
+    private int commentCount;
+
+    public static PostListResponseDto from(Post post) {
+        return PostListResponseDto.builder()
+                .id(post.getId())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .boardType(post.getBoard().getType().name())
+                .writerId(post.getWriter().getId())
+                .writerName(post.getWriter().getName())
+                .commentCount(post.getComments() != null ? post.getComments().size() : 0)
+                .build();
+    }
 }

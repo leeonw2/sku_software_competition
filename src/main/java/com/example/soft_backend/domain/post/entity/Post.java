@@ -33,7 +33,7 @@ public class Post {
 
 
     // 추가된 부분
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Comment> comments = new ArrayList<>();
 
@@ -50,7 +50,7 @@ public class Post {
     //작성자 연결 (채팅 신청할 때 게시글 작성자가 누구인지 알아보기 위함)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "writer_id", nullable = false)
-    private UserEntity writer;
+    private UserEntity writer;  //여기가 문제다!!!
 
     public Long getWriterId() {
         return writer != null ? writer.getId() : null;

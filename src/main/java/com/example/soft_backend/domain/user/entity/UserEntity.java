@@ -32,6 +32,10 @@ public class UserEntity {
     private String gender;
 
     @Enumerated(EnumType.STRING)
+    @Column(length = 10)
+    private CoopStyle coopStyle;   // 협업 스타일 코드
+
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private UserRole role;
 
